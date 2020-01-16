@@ -1,4 +1,4 @@
-
+#!/bin/python3
 from ui import *
 from xml.etree import ElementTree
 import xml.etree.cElementTree as ET
