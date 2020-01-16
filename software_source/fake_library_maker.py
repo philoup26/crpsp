@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/python3
 # vim:fileencoding=utf-8
 import os
 import urllib

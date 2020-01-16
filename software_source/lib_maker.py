@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# vim:fileencoding=utf-8
+#!/bin/python3
 import os
 from file_read_backwards import FileReadBackwards
 import urllib.request as urllib
