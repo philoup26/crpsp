@@ -1,0 +1,58 @@
+\ProvidesPackage{crla_titlepage}[2015/08/10 v.01 an
+example package^^J for wikibooks]
+\RequirePackage{graphicx}
+\RequirePackage[french]{babel}
+
+\newcommand*{\personaltitle}[1]{\gdef\@personaltitle{#1}%
+}
+\newcommand*{\classnb}[1]{\gdef\@classnb{#1}%
+}
+\newcommand*{\subject}[1]{\gdef\@subject{#1}%
+}
+\newcommand*{\group}[1]{\gdef\@group{#1}%
+}
+\renewcommand*{\author}[1]{\gdef\@author{#1}%
+}
+\newcommand*{\institution}[1]{\gdef\@institution{#1}%
+}
+\newcommand*{\programtype}[1]{\gdef\@programtype{#1}%
+}
+\newcommand*{\presentation}[1]{\gdef\@presentation{#1}%
+}
+\newcommand*{\logo}[1]{\gdef\@logo{#1}%
+}
+
+\newcommand*{\@personaltitle}{ }
+\newcommand*{\@classnb}{ }
+\newcommand*{\@subject}{ }
+\newcommand*{\@group}{ }
+\renewcommand*{\@author}{Benjamin Chausse}
+\newcommand*{\@institution}{Cégep régional de Lanaudière à l'Assomption}
+\newcommand*{\@programtype}{Sciences de la nature}
+\newcommand*{\@presentation}{Travail remis à:}
+\newcommand*{\@logo}{ }
+
+\newcommand*{\teacher}[1]{\gdef\@teacher{#1}%
+}
+\newcommand*{\@teacher}{\texttt{\string\teacher} currently
+not set. Please fix this.}
+\renewcommand*{\maketitle}{%
+\begin{titlepage}
+\vspace*{2cm}
+	\centering
+{\bfseries\@title\unskip\strut\par} % Title
+{\@personaltitle\unskip\strut\par}  % Subtitle
+\vspace{0.5cm}
+{\@classnb\hspace{0.2cm}\@subject\unskip\strut\par}
+\vspace{2.0cm}
+{\bfseries\@author\unskip\strut\par}
+{\bfseries\@logo\unskip\strut\par}
+\vfill
+{\@presentation\unskip\strut\par}
+\vspace{2.8cm}
+{\@programtype\unskip\strut\par}
+{\@institution\unskip\strut\par}
+{\large \@date\par}
+\end{titlepage}
+}
+\endinput

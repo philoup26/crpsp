@@ -1,0 +1,95 @@
+\documentclass[11pt, A4]{article}
+
+\usepackage{startup}
+\usepackage{crla_titlepage}
+
+\title{CRPSP}
+\personaltitle{Cesium Radioactivity Perfect Secrecy Protocol \\
+A privately usable system for secure communications}
+% \classnb{<++>}
+\subject{Personal Project}
+% \group{<++>}
+% \author{}
+% \logo{}
+\presentation{}
+% \teacher{Nom de l'enseignant}
+\programtype{\vspace{3cm}}
+\institution{}
+% \date{<++>}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{About}
+%TODO: Write About
+<++>
+
+\section{Terminology}
+%TODO: Write Terminology
+<++>
+
+\section{Usage}
+<++>
+
+\section{Process}
+\subsection{Data Acquisition}
+The first step in this protocol is acquiring purely random data. This is done
+using HotBits: A non-lucrative organisation which gives random data generated
+by a Cesium reactor. To do so, a micro-computer (Raspberry Pi) downloads
+2048 bit packages of data up to a total of approximately 2 Gigabytes. The
+packages are stored in an index folder which has a ``.crpsp'' file extension.
+The 2048 bit packages are stored in a ``.xml'' file.
+
+\subsubsection{Index Structure}
+The index contains four main entities: \textbf{root}, \textbf{hierarchy},
+\textbf{xml}, and \textbf{breadcrumbs}. \\
+
+\textbf{Root:} This entity is a folder which holds breadcrumbs, the hierarchy,
+as well as the log file. The folder itself must end with ``.crpsp''
+for easier recognition. The purpose and structure of the log file will be
+further discussed later. \\
+
+\textbf{Hierarchy:} This section is the one in which all the xml packages are
+organised. It consists of a set of 100 folders (labelled from 00-99)
+each containing 100 folders (labelled in the same fashion) which each
+contain 100 xml random data packages: the XML entity.\\  % TODO: Finish up
+
+\textbf{XML:} This entity holds random data acquired from HotBits.
+As it may very well be deduced,  it consists of an xml file for which the
+structure is the following.  %TODO: Explain the xml structure
+
+\textbf{Breadcrumbs:} This section is the one which reutilises the remains of
+previously used xml packages. It serves as a middleground in which packages
+with a length smaller than 2048 bits can be stored until they are recombined
+into a new unique xml package which will be stored in the index. \\
+
+\subsubsection{XML file Structure}
+\begin{table}
+    \caption{Xml File Structure}
+    \label{xml_file_structure}
+    \begin{center}
+        \begin{tabular}{l | l |l l}
+            \toprule
+            \multicolumn{2}{c}{Tag} & Description \\
+            \toprule
+            hotbits & & & Root tag \\
+                    & status & & \\
+                    & request-information & <++> \\
+                    & & server-version & <++> \\
+                    & & generation-time & <++> \\
+                    & & bytes-requested & <++> \\
+                    & & bytes-returned & <++> \\
+                    & & quota-request-remaining & <++> \\
+                    & & quota-bytes-remaining & <++> \\
+                    & & generator-type & <++> \\
+                    & random-data &  & <++> \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+\end{table}
+
+<++>
+
+\end{document}

@@ -1,0 +1,204 @@
+\ProvidesPackage{startup}
+
+
+%Trois lignes liées é l'ordinateur avec lequel on produit le document.
+\RequirePackage[french]{babel}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[version=4]{mhchem}
+\RequirePackage[top=2cm,bottom=2cm,left=2.5cm,right=2.5cm,includehead=true,headheight=1cm]{geometry}%Pour ajustement des marges.
+\RequirePackage{amsbsy}%Accés à des symboles mathématiques
+\RequirePackage{amsfonts}%Accés é des symboles mathématiques
+\RequirePackage[leqno]{amsmath}%Pour que les équations soient numérotées é gauche.
+\RequirePackage{etoolbox,refcount}
+\RequirePackage[normalem]{ulem}%For underlining text
+\RequirePackage{float}%Better Control over float elements
+\RequirePackage{gensymb}%Generic symbol in math mode (ex: degrees)
+\RequirePackage{rotating}%Rotate elements
+\RequirePackage{fixltx2e}%Helps issue warnings
+\RequirePackage{amssymb}%Accés é des symboles mathématiques
+\RequirePackage{bm}%Pour mettre en gras n'importe quel symbole.
+\RequirePackage{enumerate}%Pour les listes d'énumération.
+\RequirePackage{fancyhdr}%Permet de modifier les entétes.
+\RequirePackage[bottom]{footmisc}%Pour avoir les notes vraiment en bas de la page.
+\RequirePackage{tikz,colortbl}%Better colors in graphs
+\RequirePackage{framed}%Pour pouvoir mettre une boite autour d'un élément.
+\RequirePackage{graphicx}%Pour insérer facilement une figure.
+\RequirePackage{multicol}%Pour créer un document é plusieurs colonnes.
+\RequirePackage{parskip}%Pour pouvoir modifier l'espace entre les paragraphes.
+\RequirePackage{setspace}%Pour pouvoir modifier l'espace entre les lignes.
+\RequirePackage{siunitx}%Pour les nombres et les unités.
+\RequirePackage{tabularx}%Utile avec les tableaux
+\RequirePackage{booktabs}%Better looking tables
+\RequirePackage{tocloft}%More control over TOCs
+\RequirePackage{siunitx}%Better comprehension of commas for LaTeX
+\RequirePackage{pgfplots}%For plotting data in graphs
+\RequirePackage{multirow}%Merge rows and columns in tables
+\RequirePackage{transparent}%Add transparency to elements
+\RequirePackage{zref-savepos}%Adds precision to hyperref for labels
+\RequirePackage{pgfplotstable}%Has to do with plotting in graphs
+\RequirePackage{upgreek}%Pour accéder aux lettres grecques en romain.
+\RequirePackage{xcolor}%Pour accéder é toutes les couleurs dans le document.
+\RequirePackage[b]{esvect}%Permet de créer des vecteurs.
+\RequirePackage[hidelinks]{hyperref}%Crée automatiquement des hyperliens lors de références croisées
+\RequirePackage{float}%More control over float elements
+\RequirePackage{aliascnt}%Adds aliasses to counter (te refresh and clear counters)
+\RequirePackage{tocbasic}%Basic control over TOCs
+
+%Don't remember... Too scared to get rid of it...
+\renewcommand*{\ext@figure}{toc}
+\renewcommand*{\ext@table}{toc}
+\makeatother
+
+
+% adds TOC as an element of the TOC
+\addtotoclist[\jobname]{toc}
+\renewcommand*\tableofcontents{\listoftoc[{\contentsname}]{toc}}
+\setuptoc{toc}{totoc}% TOC entry in TOC
+
+% Inserts figures and tables inside the table of contents under the section where they are found
+\newcommand\entrywithprefix[2]{\hfill#1~#2 - }
+\DeclareTOCStyleEntry[
+  numwidth=6em,
+  entrynumberformat=\entrywithprefix{\tablename}
+]{tocline}{table}
+\DeclareTOCStyleEntry[
+  numwidth=6em,
+  entrynumberformat=\entrywithprefix{\figurename}
+]{tocline}{figure}
+
+
+% Creates a float environment to give captions to equations:
+%\begin{eqfloat}
+%   \begin{align}
+%       f(x)=ax+b
+%   \end{align}
+%   \label{eq:linear_fct}
+%   \caption{this is a linear function}
+%\end{eqfloat}
+\newaliascnt{eqfloat}{equation}
+\newfloat{eqfloat}{h}{eqflts}
+\floatname{eqfloat}{Équation}
+\newcommand*{\ORGeqfloat}{}
+\let\ORGeqfloat\eqfloat
+\def\eqfloat{%
+ \let\ORIGINALcaption\caption
+ \def\caption{%
+ \addtocounter{equation}{-1}%
+ \ORIGINALcaption
+ }%
+ \ORGeqfloat
+}
+
+% Give single equations a name
+\newcommand{\eqname}[1]{\tag*{#1}}% Tag equation with name
+
+% Allows to put definition of eqation parameters under the equation:
+%\begin{align}
+%    f(x)=ax+b
+%\end{align}
+%\begin{conditions}[If you want something other than "Où:"]
+%    a & slope of the trendline \\
+%    b & value at the origin of the function
+%\end{conditions}
+\newenvironment{conditions}[1][Où:]
+  {#1 \par\vspace{\abovedisplayskip}\noindent
+   \tabularx{\columnwidth}{>{$}l<{$} @{${}={}$} >{\raggedright\arraybackslash}X}}
+  {\endtabularx\par\vspace{\belowdisplayskip}}
+
+% Allows midline comments using \cmnt{}
+\newcommand{\cmmnt}[1]{\ignorespaces}
+
+% Allows to strike off a cell with an "X" inside tabulars
+% Inside the cell you want to strike off, insert \notableentry
+\newcounter{NoTableEntry}
+\renewcommand*{\theNoTableEntry}{NTE-\the\value{NoTableEntry}}
+\newcommand*{\notableentry}{%
+ \multicolumn{1}{@{}c@{}|}{%
+ \stepcounter{NoTableEntry}%
+ \vadjust pre{\zsavepos{\theNoTableEntry t}}% top
+ \vadjust{\zsavepos{\theNoTableEntry b}}% bottom
+ \zsavepos{\theNoTableEntry l}% left
+ \hspace{0pt plus 1filll}%
+ \zsavepos{\theNoTableEntry r}% right
+ \tikz[overlay]{%
+ \draw[black]
+ let
+  \n{llx}={\zposx{\theNoTableEntry l}sp-\zposx{\theNoTableEntry r}sp},
+  \n{urx}={0},
+  \n{lly}={\zposy{\theNoTableEntry b}sp-\zposy{\theNoTableEntry r}sp},
+  \n{ury}={\zposy{\theNoTableEntry t}sp-\zposy{\theNoTableEntry r}sp}
+ in
+ (\n{llx}, \n{lly}) -- (\n{urx}, \n{ury})
+ (\n{llx}, \n{ury}) -- (\n{urx}, \n{lly})
+ ;
+ }%
+ }%
+}
+
+
+% Allows to set counters for numbered elements (section, equations, figures, tables)
+\usetikzlibrary{calc}
+
+%Pour s'assurer que les hyperliens n'aient pas une couleure bleu mais demeure noire dans le document
+\hypersetup{
+ colorlinks=false,
+}
+
+
+%Pour créer des colonnes de tableau avec package é tabularx é
+\newcolumntype{L}[1]{>{\hfill\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+
+%Pour que les tableaux s'appellent des tableaux.
+\renewcommand\frenchtablename{ \textsc{Tableau}}
+
+
+\sisetup{locale = FR,per-mode=symbol}%Pour que les nombres soient écrits avec une virgule.
+
+
+%Les quatre lignes qui suivent définissent l'espace entre les paragraphes, l'indentation, l'espace entre les lignes et la distance entre une boite et ce qu'elle contient.
+\parskip=5pt
+\parindent=0pt
+\onehalfspacing
+\fboxsep=2pt
+
+
+%Pour créer des vecteurs avec une lettre normale ou une lettre grecque
+\newcommand{\vecteur}[1]{
+\vv{\mathbf{#1}}
+}
+\newcommand{\vecteurg}[1]{
+\vv{\boldsymbol{#1}}
+}
+
+%Automatically make two columns bullet lists using :
+%  \begin{AutoMultiColItemize}
+\newcounter{countitems}
+\newcounter{nextitemizecount}
+\newcommand{\setupcountitems}{%
+  \stepcounter{nextitemizecount}%
+  \setcounter{countitems}{0}%
+  \preto\item{\stepcounter{countitems}}%
+}
+\makeatletter
+\newcommand{\computecountitems}{%
+  \edef\@currentlabel{\number\c@countitems}%
+  \label{countitems@\number\numexpr\value{nextitemizecount}-1\relax}%
+}
+\newcommand{\nextitemizecount}{%
+  \getrefnumber{countitems@\number\c@nextitemizecount}%
+}
+\newcommand{\previtemizecount}{%
+  \getrefnumber{countitems@\number\numexpr\value{nextitemizecount}-1\relax}%
+}
+\makeatother
+\newenvironment{AutoMultiColItemize}{%
+\ifnumcomp{\nextitemizecount}{>}{3}{\begin{multicols}{2}}{}%
+\setupcountitems\begin{itemize}}%
+{\end{itemize}%
+\unskip\computecountitems\ifnumcomp{\previtemizecount}{>}{3}{\end{multicols}}{}}
+
+
+\endinput
