@@ -1,17 +1,9 @@
-#!/usr/bin/python3
 from ui import *
-from libraries import get_dict
 from xml.etree import ElementTree
 import xml.etree.cElementTree as ET
 import random as rdm
 from tqdm import tqdm
 from file_read_backwards import FileReadBackwards
-
-def cd(path):
-    """
-    Better Integrated chdir
-    """
-    os.chdir(os.path.expanduser(path))
 
 def traduce (key, table):
     """
@@ -21,7 +13,6 @@ def traduce (key, table):
     for each  in key:
         final_hexToBinary+=table[each]
     return(final_hexToBinary)
-
 def xor(x, y):
     """
     Permet de xor deux strings contenant uniquement des 1 et des 0
@@ -33,8 +24,7 @@ def file_len(fname="/Users/Benjamin/Documents/crpsp/testIndex.crpsp/log.txt"):
     """
     Outputs how many lines the log.txt file has.
     """
-    test = os.getcwd()
-    with open(test+"/log.txt") as f:
+    with open(fname) as f:
         for i, l in enumerate(f):
             pass
         return i + 1
@@ -99,10 +89,8 @@ def findSInLog(m="/home/master/Documents/crpsp/software_source/test00"):
     This function will determine using the log, what is the last file that was deleted (or sent to BreadCrumbs).
     This will allow the encryption protocol to determine which file to use.
     """
-    test = os.path.abspath("~/")
-    test = test[:-1]
-    pbar = tqdm(total=file_len(test)*2)
-    with FileReadBackwards(test+"/log.txt") as LogFile:  # Opens the log file (read backwds)
+    pbar = tqdm(total=file_len(m)*2)
+    with FileReadBackwards(m) as LogFile:  # Opens the log file (read backwds)
         i_d = None
         for line in (LogFile):  # Searched every line from the bottom for S or D
             pbar.update(1)
@@ -121,21 +109,20 @@ def findSInLog(m="/home/master/Documents/crpsp/software_source/test00"):
             return "00-00-00.xml"
             pbar.close()
 
-def crpsp_protocol(message, indexPath, encodage):
+def crpsp_protocol(message, indexPath="/home/master/Documents/crpsp/software_source/test00"):
     """
     Take the a message and path to an random xml data library
     """
+
     print("Finding correct randomness xml file to use...")
-    all_dictionaries = get_dict()
-    cd('~/')  # Go into the index
-    cd(indexPath)  # Go into the index
+    os.chdir(indexPath)  # Go into the index
     randomxml = next(findSInLog(indexPath+"log.txt"))
     print("Done!")
     space(2)
     print(randomxml+" will be used.")
     print("Encrypting...")
     xmlPath = randomxml[0:2]+"/"+randomxml[3:5]#+"/"+randomxml[6:8]
-    cd(indexPath+xmlPath)
+    os.chdir(indexPath+xmlPath)
     tree = ElementTree.parse(randomxml)
     root = tree.getroot()
     cle = ""
@@ -143,11 +130,14 @@ def crpsp_protocol(message, indexPath, encodage):
         cle = random_data.text
         cle = cle.replace('\n', ' ').replace('\r', '').replace(' ', '').replace('\t', '')
 
+    encodage_cinq_bit = {'a': '00000', 'b': '00001', 'c': '00010', 'd': '00011', 'e': '00100', 'f': '00101', 'g': '00110', 'h': '00111', 'i': '01000', 'j': '01001', 'k': '01010', 'l': '01011', 'm': '01100', 'n': '01101', 'o': '01110', 'p':'01111', 'q': '10000', 'r': '10001', 's': '10010', 't': '10011', 'u': '10100', 'v': '10101', 'w': '10110', 'x': '10111', 'y': '11000', 'z': '11001', '_': '11010', '.': '11011', '-': '11100', ',': '11101', '(': '11110', ')': '11111'}
+    decodage_cinq_bit = {'00000': 'a', '00001': 'b', '00010': 'c', '00011': 'd', '00100': 'e', '00101': 'f', '00110':'g', '00111': 'h', '01000': 'i', '01001': 'j', '01010': 'k', '01011': 'l', '01100': 'm', '01101': 'n', '01110': 'o', '01111': 'p', '10000': 'q', '10001': 'r', '10010': 's', '10011': 't', '10100': 'u', '10101': 'v', '10110': 'w', '10111': 'x', '11000': 'y', '11001': 'z', '11010': '_', '11011': '.', '11100': '-', '11101': ',', '11110': '(', '11111': ')'}
+    hexToBinaryTable = {'0':'0000', '1':'0001', '2':'0010','3':'0011', '4': '0100', '5': '0101', '6':'0110', '7': '0111', '8': '1000', '9': '1001', 'A': '1010', 'B': '1011', 'C': '1100', 'D': '1101', 'E': '1110', 'F': '1111'}
 
     #assigner la clé en hexadecimal ici
 
-    clef=traduce(cle, all_dictionaries['autres']['hexToBinaryTable']) #transforme la clé en binaire selon le dictionaire hexToBinaryTable
-    msg=traduce(message, all_dictionaries['encodages'][encodage])  #tranforme le message en binaire selon le dictionaire encodage_cinq_bit  #TODO: Laisser l'utilisateur choisir le type d'encodage
+    clef=traduce(cle,hexToBinaryTable) #transforme la clé en binaire selon le dictionaire hexToBinaryTable
+    msg=traduce(message,encodage_cinq_bit)  #tranforme le message en binaire selon le dictionaire encodage_cinq_bit
     if len(clef)>=len(msg):  #si la clé est plus longue ou de même longueur au message
         g=len(clef)-len(msg)  #détermine de combien de bits la clé est plus longues
         # les "g/4" derniers caractères de la clé ne sont pas utilisé
@@ -161,15 +151,6 @@ def crpsp_protocol(message, indexPath, encodage):
     crya=xor(msg,clef)  #encrypte le message
     print(crya)
     output = [crya, randomxml]
-    os.system("rm "+randomxml)
-    for i in range(2):
-        os.chdir("..")
-    log = open("log.txt", "a+")
-    log.write("\nS : "+randomxml)  # Sets the name (ID) of every file based on it's index)
-    log.close()
-    breadcrumbs_file = open("breadcrumbs.txt", "a+")
-    breadcrumbs_file.write(breadcrumbs)  # Sets the name (ID) of every file based on it's index)
-    breadcrumbs_file.close()
     return output
 
 
@@ -178,7 +159,7 @@ def crpsp_protocol(message, indexPath, encodage):
     # TODO: Actually make the encryption protocol
     pass
 
-def main(lib_path):
+def main():
     """
     "Proper" introduction...
     """  #TODO: Write a proper introduction
@@ -201,11 +182,9 @@ def main(lib_path):
 
     # Encoding (into xml)
     header("Type d'encodage")
-    list_of_encodings = []
-    all_dictionaries = get_dict()
-    for available_encodings in all_dictionaries['encodages']:
-        list_of_encodings.append(available_encodings)
-
+    list_of_encodings = [
+    "encodage_cinq_bit",
+    ]
     encodage_choisi = multiple_choices("Please enter the encoding you desire:", list_of_encodings)
     space(4)
 
@@ -215,16 +194,16 @@ def main(lib_path):
     ET.SubElement(doc, "subject").text  = subject  # The subject
     space(4)
 
-    # Preface (into xml)
+        # Preface (into xml)
     header("Message Preface")
     preface = request("Please enter the message's preface (Maximum 500 characters)")
     ET.SubElement(doc, "preface").text  = preface  # The preface
     space(4)
 
-    # Encrypted Contents
+    # Encrypted Contents - TODO: Actually apply the XOR function to the contents
     header("Encrypted Content")
     message = request("Please enter the content which you would like to encrypt (maximum 140 characters):")
-    encryption_result = crpsp_protocol(message, lib_path, encodage_choisi)
+    encryption_result = crpsp_protocol(message, "/home/master/Documents/crpsp/software_source/test00/")
     ET.SubElement(doc, "contents").text = encryption_result[0]
     space(4)
 
@@ -234,7 +213,7 @@ def main(lib_path):
     ET.SubElement(doc, "postface").text = postface  # The postface of the message
     space(4)
 
-    ### TODO: To be completed from here: ###
+    ### To be completed from here: ###
 
     # Closes and writes the xml file
     doc = ET.SubElement(root, "doc")  # The document holder for things seen by the user.
@@ -255,7 +234,4 @@ def main(lib_path):
     os.getcwd()
 
 if __name__ == "__main__":
-    lib_path = request("Where is the library folder located (not including the '.crpsp' file extension)?")+".crpsp/"
-    if not os.path.exists(lib_path):
-        os.system("mkdir -p "+lib_path)
-    main(lib_path)
+    main()
